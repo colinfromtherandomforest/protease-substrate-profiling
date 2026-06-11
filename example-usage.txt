@@ -1,0 +1,47 @@
+Analysis of protease substrate profiling experiments.
+McCreary et al., Nature Biotechnology, 2026.
+
+Example here given for the analysis of X(PC) cleavage on the combinatorial substrate library (depicted in Fig. 3D, experiment ID xCFH016).
+
+######
+
+STEP 1: Count occurrences of substrate sequences from raw sequencing data.
+
+Execution:
+Run the following command in a directory containing the analysis script (t7s_count_xCFH016.sh), the fastq.gz files to be analyzed, and the reference substrate sequence (procas1_recode.fa):
+
+sh t7s_count_xCFH016.sh procas1_recode.fa
+
+Dependencies:
+BWA (brew install bwa)
+SAMtools (brew install samtools)
+Biopython (pip install biopython)
+pandas (pip install pandas)
+count_aa_xCFH016.py (Python script for analyzing read counts, must be included in the same directory as t7s_count_xCFH016.sh)
+
+Outcome:
+CSV file within directory 'summary_output' named 'aa_count.csv' containing read counts for each protease substrate sequence in every sample.
+
+######
+
+STEP 2: Calculate enrichment values and perform filtering of substrate sequences
+Run the Matlab script 'xCFH016_Filtering.m' to perform filtering and enrichment calculations. The sequence count file 'aa_count.csv' must be present in the same directory.
+
+Dependencies:
+hammingExtractor.m (supplementary Matlab script included in same directory as xCFH016_Filtering.m)
+
+Outcome:
+CSV file within same directory named 'xCFH016_sCFH035_activePositive.csv' listing substrates and associated enrichment values. A '.mat' file of the same name is also generated for input into the proteome-wide substrate search (Step 3, below).
+
+######
+
+STEP 3: Identify sequences within target proteomes.
+NOTE: This step is used for xCFH016 only; other selection experiments do not leverage proteome searches.
+Run the Matlab script 'ProteomeSearch.m' to identify sequences within a target proteome that match enriched sequences within 'xCFH016_sCFH035_activePositive.csv,' generated in the previous step.
+
+Dependencies:
+UP000005640_SwissProt.fasta (FASTA file containing target proteome; must be included in the same directory as 'ProteomeSearch.m')
+xCFH016_sCFH035_activePositive.mat (enrichment data table generated in Step 2)
+
+Outcome:
+CSV file within same directory named 'proteomeSearch_xCFH016_sCFH035.csv' that lists putative hits.
